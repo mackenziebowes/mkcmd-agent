@@ -39,7 +39,7 @@ export default function UsagePage() {
               ]}
             />
             <P>
-              Any directory works; these docs use <C>~/mkcmd-agent</C>. The examples below call it as{" "}
+              Any directory works; these docs use <C>~/mkcmd-agent</C>, and the examples below call it as{" "}
               <C>mkcmd-agent</C>, which from source means <C>bun ~/mkcmd-agent/src/index.ts</C>.
             </P>
             <P>
@@ -97,7 +97,7 @@ export default function UsagePage() {
 
       <DocSection id="add" title="add">
         <P>
-          Add a command to a project made by <C>init</C>. Writes <C>src/commands/&lt;name&gt;.ts</C> from a template and
+          Add a command to a project made by <C>init</C>: it writes <C>src/commands/&lt;name&gt;.ts</C> from a template and
           adds it to the list in <C>src/commands/index.ts</C>. The new command throws <C>not_implemented</C> until you
           write its <C>run</C>.
         </P>
@@ -141,7 +141,7 @@ export default function UsagePage() {
         </BlueprintCodeBlock>
         <P>
           Scripts: <C>bun run start</C>, <C>bun test</C>, <C>bun run typecheck</C>, and <C>bun run build</C> for a
-          single compiled binary in <C>dist/</C>. After <C>bun install</C> the project passes its own tests and{" "}
+          single compiled binary in <C>dist/</C>; after <C>bun install</C> the project passes its own tests and{" "}
           <C>tsc --noEmit</C>.
         </P>
         <P>

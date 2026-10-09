@@ -2,7 +2,7 @@
 
 Scaffold Bun CLIs for agents to drive.
 
-Most CLIs are built for someone at a keyboard: they ask questions, print decorated text, and exit 0 when something goes wrong. An agent can't answer a prompt, can't reliably parse a banner, and can't tell success from failure. mkcmd-agent generates CLIs with a contract built for agents.
+Most CLIs are built for someone at a keyboard. They ask questions, print decorated text, and exit 0 when something goes wrong, so an agent can't answer the prompt, can't reliably parse the banner, and can't tell success from failure. mkcmd-agent generates CLIs with a contract built for agents.
 
 Docs: **[mkcmd.mackenziebowes.com](https://mkcmd.mackenziebowes.com)**
 
@@ -103,7 +103,7 @@ bun run build       # dist/index.js, with templates bundled in
 
 The test suite drives the CLI as a subprocess, generates real projects, runs their tests, and checks the built bundle.
 
-`src/templates/cli.ts.txt` is a copy of `src/core/cli.ts`, because Bun can't import one file as both code and text. `bun run sync-core` refreshes it and the end-to-end bundle test fails if they drift. More in [AGENTS.md](./AGENTS.md).
+`src/templates/cli.ts.txt` is a copy of `src/core/cli.ts`, because Bun can't import one file as both code and text; `bun run sync-core` refreshes it, and the end-to-end bundle test fails if they drift. More in [AGENTS.md](./AGENTS.md).
 
 The docs site lives in [`site/`](./site).
 

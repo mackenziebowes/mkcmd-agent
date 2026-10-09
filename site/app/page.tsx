@@ -169,7 +169,7 @@ export default function Home() {
                         <BlueprintCard
                             number="01"
                             title="Flags, not prompts"
-                            description="Every input is a flag. A missing required flag fails fast with exit 2 and a working example, instead of waiting on stdin."
+                            description="Every input is a flag. A missing required flag fails fast with exit 2 and a working example. Nothing waits on stdin."
                         />
                         <BlueprintCard
                             number="02"
@@ -191,7 +191,7 @@ export default function Home() {
                         <BlueprintCard
                             number="05"
                             title="add"
-                            description="mkcmd-agent add writes a command file and registers it, so nobody hand-edits the command list."
+                            description="mkcmd-agent add writes a command file and registers it. Nobody hand-edits the command list."
                         />
                         <BlueprintCard
                             number="06"
@@ -235,7 +235,7 @@ export default function Home() {
                         </div>
                         <p>
                             A fork of <a className="underline" href={contentConfig.originalRepo}>mkcmd</a>, which
-                            scaffolds the same kind of CLI through interactive prompts. mkcmd-agent keeps the idea and
+                            scaffolds the same kind of CLI through interactive prompts; mkcmd-agent keeps the idea and
                             rebuilds the interface around flags, structured output and exit codes.
                         </p>
                         <p className="mt-4">
