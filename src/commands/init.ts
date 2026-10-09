@@ -1,4 +1,5 @@
-import { resolve, relative } from "node:path";
+import { dirname, join, resolve, relative } from "node:path";
+import { existsSync, realpathSync } from "node:fs";
 import { defineCommand, CliError, UsageError } from "../core/cli";
 import { binName, isValidPackageName, planProject } from "../scaffold/project";
 import { isEmptyDir, writeFiles } from "../scaffold/write";
@@ -9,7 +10,7 @@ export const init = defineCommand({
   description:
     "Writes a Bun + TypeScript CLI with the agent contract built in: --json output, exit codes, describe, per-command help and subprocess tests.",
   flags: {
-    name: { type: "string", required: true, description: "Package name, e.g. my-cli or @scope/my-cli", prompt: "Project name?" },
+    name: { type: "string", required: true, description: "Package name, e.g. my-cli or @scope/my-cli" },
     description: { type: "string", default: "A command-line tool.", description: "One line on what the CLI does" },
     dir: { type: "string", description: "Where to create it (default: ./<name>)" },
     force: { type: "boolean", description: "Write into a non-empty directory, overwriting files" },
@@ -52,7 +53,11 @@ export const init = defineCommand({
       }
     }
 
-    const rel = relative(process.cwd(), dir) || ".";
+    // Compare real paths: on macOS /var is a symlink to /private/var.
+    // A path that doesn't exist yet (--dry-run) resolves through its nearest existing parent.
+    const real = (p: string): string => (existsSync(p) ? realpathSync(p) : join(real(dirname(p)), p.slice(dirname(p).length + 1)));
+    const rel = relative(real(process.cwd()), real(dir)) || ".";
+    const cdTo = rel.startsWith("..") ? dir : rel; // an absolute path beats ../../../..
     return {
       name: flags.name,
       bin,
@@ -60,7 +65,7 @@ export const init = defineCommand({
       dryRun: flags["dry-run"],
       files: files.map((f) => f.path),
       next: [
-        `cd ${rel}`,
+        `cd ${cdTo}`,
         ...(flags.install ? [] : ["bun install"]),
         "bun run src/index.ts describe",
         "bun test",

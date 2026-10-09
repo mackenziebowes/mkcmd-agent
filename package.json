@@ -1,6 +1,6 @@
 {
 	"name": "@mbsi/mkcmd-agent",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Scaffold Bun CLIs that agents can drive: flags only, --json output, real exit codes, and a describe command.",
 	"license": "MIT",
 	"author": "Mackenzie Bowes <mackenzie@mackenziebowes.com> (https://mackenziebowes.com)",

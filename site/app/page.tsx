@@ -134,10 +134,22 @@ export default function Home() {
                 </section>
 
                 <section>
-                    <SectionTitle title="Two operators, one contract" refNo="B-02" />
+                    <SectionTitle title="An agent's first three calls" refNo="B-02" />
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div className="min-w-0">
-                            <div className="text-xs text-(--ink-secondary) mb-1">FIG. A · AN AGENT</div>
+                            <div className="text-xs text-(--ink-secondary) mb-1">FIG. A · LEARN THE CLI</div>
+                            <BlueprintTerminal
+                                className="overflow-x-auto"
+                                commands={["my-cli describe"]}
+                                output={[
+                                    '{"name":"my-cli","commands":[{"name":"hello","usage":"my-cli hello --name <name> [flags]",',
+                                    '  "flags":[{"name":"--name","type":"string","required":true,...}],',
+                                    '  "examples":["my-cli hello --name Ada --json"]}]}',
+                                ]}
+                            />
+                        </div>
+                        <div className="min-w-0">
+                            <div className="text-xs text-(--ink-secondary) mb-1">FIG. B · FAIL, THEN SUCCEED</div>
                             <BlueprintTerminal
                                 className="overflow-x-auto"
                                 commands={["my-cli hello --json", "echo $?", "my-cli hello --name Ada --json"]}
@@ -147,17 +159,6 @@ export default function Home() {
                                     '{"ok":true,"command":"hello","result":{"greeting":"Hello, Ada!"}}',
                                 ]}
                             />
-                        </div>
-                        <div className="min-w-0">
-                            <div className="text-xs text-(--ink-secondary) mb-1">FIG. B · A PERSON AT A TERMINAL</div>
-                            <BlueprintTerminal
-                                commands={["my-cli hello"]}
-                                output={["Who should I greet? Ada", "Hello, Ada!"]}
-                            />
-                            <p className="mt-4 text-sm text-[#555]">
-                                Same command. The prompt appears only for a human at a terminal, and never with{" "}
-                                <code>--json</code> or <code>--no-input</code>.
-                            </p>
                         </div>
                     </div>
                 </section>

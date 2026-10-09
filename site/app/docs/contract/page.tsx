@@ -5,7 +5,7 @@ import { ogImage } from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: "Output contract",
-  description: "How every mkcmd-agent CLI behaves: the --json envelope, exit codes, stderr, describe, help, and when it prompts.",
+  description: "How every mkcmd-agent CLI behaves: the --json envelope, exit codes, stderr, describe and help.",
   openGraph: ogImage("docs-contract", "Topographic map generated from the mkcmd-agent output contract docs"),
 };
 
@@ -23,13 +23,12 @@ export default function ContractPage() {
           <BlueprintArgTable
             headers={["Rule", "Behaviour"]}
             rows={[
-              { Rule: "Input", Behaviour: "Flags and positionals. Nothing waits on stdin unless a human is at a terminal." },
+              { Rule: "Input", Behaviour: "Flags and positionals. Nothing prompts or waits on stdin." },
               { Rule: "--json", Behaviour: "Exactly one JSON object on stdout, success or failure." },
               { Rule: "stderr", Behaviour: "Progress and logs only. stdout carries the result and nothing else." },
               { Rule: "Exit codes", Behaviour: "0 success, 1 failure, 2 usage error." },
               { Rule: "describe", Behaviour: "Every command, flag, default and example, as JSON." },
               { Rule: "--help", Behaviour: "Usage, flags and examples for one command, as text." },
-              { Rule: "--no-input", Behaviour: "Never prompt, even at a terminal." },
             ]}
           />
         </div>
@@ -83,7 +82,7 @@ export default function ContractPage() {
 
       <DocSection id="flags" title="Flags">
         <P>
-          Global flags work on every command: <C>--json</C>, <C>-h, --help</C>, <C>--no-input</C>.{" "}
+          Global flags work on every command: <C>--json</C> and <C>-h, --help</C>.{" "}
           <C>-v</C> or <C>--version</C> works as the first argument.
         </P>
         <P>
@@ -93,16 +92,10 @@ export default function ContractPage() {
         </P>
       </DocSection>
 
-      <DocSection id="prompts" title="When it prompts">
-        <P>A CLI asks a question only when all of these hold:</P>
-        <ul className="mt-4 text-sm text-[#444] list-disc pl-6 space-y-1">
-          <li>a required flag is missing and declares a <C>prompt</C>,</li>
-          <li>both stdin and stdout are a terminal,</li>
-          <li>and neither <C>--json</C> nor <C>--no-input</C> was passed.</li>
-        </ul>
+      <DocSection id="prompts" title="No prompts">
         <P>
-          Otherwise a missing required flag is an immediate usage error (exit 2) with an example. An agent running
-          commands through a tool or a pipe never sees a prompt. An empty answer counts as missing.
+          Nothing asks a question. A missing required flag is an immediate usage error (exit 2) whose hint is the
+          command&apos;s first example, so the caller learns the right invocation from the failure itself.
         </P>
       </DocSection>
 

@@ -1,6 +1,6 @@
 export const contentConfig = {
   copyright: "Mackenzie Bowes ©",
-  version: "0.1.0",
+  version: "0.2.0",
   packageName: "@mbsi/mkcmd-agent",
   bin: "mkcmd-agent",
   /** Flip once `npm publish` has run; the docs switch from source install to bunx. */

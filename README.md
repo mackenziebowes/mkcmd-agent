@@ -1,8 +1,8 @@
 # mkcmd-agent
 
-Scaffold Bun CLIs that an agent can drive as easily as a person.
+Scaffold Bun CLIs for agents to drive.
 
-Most CLIs are built for someone at a keyboard: they ask questions, print decorated text, and exit 0 when something goes wrong. An agent can't answer a prompt, can't reliably parse a banner, and can't tell success from failure. mkcmd-agent generates CLIs with a contract that works for both.
+Most CLIs are built for someone at a keyboard: they ask questions, print decorated text, and exit 0 when something goes wrong. An agent can't answer a prompt, can't reliably parse a banner, and can't tell success from failure. mkcmd-agent generates CLIs with a contract built for agents.
 
 Docs: **[mkcmd.mackenziebowes.com](https://mkcmd.mackenziebowes.com)**
 
@@ -24,12 +24,11 @@ Every generated CLI, and mkcmd-agent itself, behaves the same way:
 
 | | |
 |---|---|
-| **Input** | Flags and positionals only. A required flag can declare a `prompt`, asked only when a human is at a terminal. |
+| **Input** | Flags and positionals only. Nothing prompts: a missing required flag is a usage error with an example. |
 | **Output** | `--json` prints one object on stdout: `{"ok": true, "command", "result"}` or `{"ok": false, "command", "error": {"code", "message", "hint"}}`. |
 | **Logs** | Progress goes to stderr, so stdout is always just the result. |
 | **Exit codes** | `0` success, `1` failure, `2` usage error (unknown command or flag, missing required flag). |
 | **Discovery** | `describe` prints every command, flag, default and example as JSON. `<command> --help` shows one command as text. |
-| **No surprises** | `--no-input` disables prompts everywhere. Nothing ever waits on stdin in a pipeline. |
 
 What that looks like to an agent:
 
@@ -40,14 +39,6 @@ $ echo $?
 2
 $ my-cli hello --name Ada --json
 {"ok":true,"command":"hello","result":{"greeting":"Hello, Ada!"}}
-```
-
-The same command for a person:
-
-```console
-$ my-cli hello
-Who should I greet? Ada
-Hello, Ada!
 ```
 
 ## Commands
@@ -83,7 +74,7 @@ export const sync = defineCommand({
 });
 ```
 
-`run` returns data and throws to fail. Flags are typed from their declarations, so `flags.since` is a `string` and `flags["dry-run"]` is a `boolean`. The framework handles parsing, help, JSON, exit codes and prompting.
+`run` returns data and throws to fail. Flags are typed from their declarations, so `flags.since` is a `string` and `flags["dry-run"]` is a `boolean`. The framework handles parsing, help, JSON and exit codes.
 
 ## What you get
 

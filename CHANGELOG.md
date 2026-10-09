@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-10-08
+
+Agents only.
+
+### Removed
+- Interactive prompts: the `prompt` field on flag specs, `ctx.interactive`, the `--no-input` global flag and the TTY check. A missing required flag is always a usage error. **Breaking** for flag specs that set `prompt`.
+
+### Added
+- `CliError` takes `details`: a failing check can still return its findings (`error.details`, or printed through `render`).
+
+### Fixed
+- `init`'s `cd` hint is an absolute path when the project is outside the working directory, and compares real paths (macOS `/var` is a symlink).
+- Empty results print `(none)`; `describe` lists short forms of global flags.
+
 ## [0.1.0] - 2026-10-08
 
 Forked from mkcmd 0.3.1 as mkcmd-agent and rebuilt for agents.

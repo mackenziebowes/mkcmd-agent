@@ -59,9 +59,9 @@ Scripts: bun run start, bun test, bun run typecheck, bun run build (compiled bin
 - Exit codes: 0 success (also --help, describe, --version); 1 command failed (its own error code, or "internal" for an unexpected exception); 2 usage error (code "usage": unknown command, unknown flag, missing required flag, invalid value; also no arguments at all).
 - describe: always pretty-printed JSON, no envelope, no --json needed. Contains name, about, contract, globalFlags, and commands[] with name, summary, description, usage, flags[] (name, short, type, required, default, description), examples[].
 - <command> --help or help <command>: one command as text. Add --json for its describe entry inside the envelope. <cli> --help lists commands.
-- Global flags on every command: --json, -h/--help, --no-input. -v/--version only as the first argument.
+- Global flags on every command: --json, -h/--help. -v/--version only as the first argument.
 - Flags: string flags take a value (--name Ada or --name=Ada). Boolean flags take none (--shout, never --shout true). Unknown flags are usage errors. Missing booleans are false; missing strings use their default or are undefined.
-- Prompts: only when a required flag declaring `prompt` is missing AND stdin and stdout are TTYs AND neither --json nor --no-input was passed. Otherwise a missing required flag is an immediate usage error with an example. An empty answer counts as missing.
+- No prompts: a missing required flag is always an immediate usage error (exit 2) showing the command's first example.
 
 ## Writing a command
 
@@ -73,13 +73,13 @@ Scripts: bun run start, bun test, bun run typecheck, bun run build (compiled bin
       summary: "Sync records from the API", // required
       description: "Longer --help text.", // optional
       flags: {
-        since: { type: "string", required: true, description: "YYYY-MM-DD", prompt: "Since which date?" },
+        since: { type: "string", required: true, description: "YYYY-MM-DD" },
         limit: { type: "string", default: "100", description: "Maximum records" },
         "dry-run": { type: "boolean", description: "Report without writing" },
       },
       args: "<file...>",                  // optional usage text for positionals (ctx.args)
       examples: ["my-cli sync --since 2026-01-01 --json"], // first one shown on a missing-flag error
-      run: async ({ flags, args, log, json, interactive }) => {
+      run: async ({ flags, args, log, json }) => {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(flags.since)) throw new UsageError("Bad date.", "Use YYYY-MM-DD."); // exit 2
         log("fetching");                  // stderr; never console.log
         const n = Number(flags.limit);    // no number flag type: convert strings yourself
@@ -91,7 +91,7 @@ Scripts: bun run start, bun test, bun run typecheck, bun run build (compiled bin
 
 Register it: add `sync` to `export const commands = [...]` in src/commands/index.ts and import it (or use `mkcmd-agent add`).
 
-Flag spec fields: type ("string" | "boolean"), description (required), required, default, short (one letter), prompt.
+Flag spec fields: type ("string" | "boolean"), description (required), required, default, short (one letter).
 Types: required or defaulted strings are string; other strings are string | undefined; booleans are boolean.
 CliError(message, { code, hint, exitCode, details }) defaults to exit 1. details is returned as error.details with --json, and printed through render() for people: use it when a check fails but its findings matter (lint, validate, gate). Always pass a code: without one, agents get the generic "error". UsageError(message, hint) exits 2 with code "usage". Other exceptions become code "internal", exit 1. Never call process.exit or print errors yourself.
 

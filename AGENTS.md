@@ -12,7 +12,7 @@ mkcmd-agent scaffolds agent-drivable Bun CLIs. It is built on the same framework
 
 ## Layout
 
-- `src/core/cli.ts`: the framework (flag parsing, `--json` envelope, exit codes, `describe`, help, TTY-only prompts). No dependencies. Shipped verbatim into generated projects, so keep it self-contained.
+- `src/core/cli.ts`: the framework (flag parsing, `--json` envelope, exit codes, `describe`, help). No dependencies. Shipped verbatim into generated projects, so keep it self-contained.
 - `src/commands/`: `init`, `add`, and `index.ts` listing them.
 - `src/scaffold/project.ts`: pure planning. `planProject` and `planCommand` return files as data; `registerInIndex` edits a commands index.
 - `src/scaffold/write.ts`: the only code that touches the filesystem.

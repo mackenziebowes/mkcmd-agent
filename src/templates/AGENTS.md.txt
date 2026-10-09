@@ -16,14 +16,14 @@ The framework in `src/core/cli.ts` enforces this for every command. Do not print
 - Without `--json`, results print as text (the command's `render`, or a key: value dump).
 - Progress goes to stderr through `ctx.log`. stdout is reserved for the result.
 - Exit codes: 0 success, 1 failure, 2 usage error (unknown command, unknown flag, missing required flag).
-- Prompts happen only for required flags that declare `prompt`, only at an interactive terminal, and never with `--json` or `--no-input`. Agents never see them.
+- Nothing prompts. A missing required flag is a usage error (exit 2) that shows the command's first example.
 
 ## Add a command
 
 `mkcmd-agent add <name> --summary "..."` writes `src/commands/<name>.ts` and registers it. By hand:
 
 1. Create `src/commands/<name>.ts` exporting `defineCommand({ name, summary, flags, examples, run })`.
-2. `run` gets `{ flags, args, json, interactive, log }` and returns JSON-serialisable data.
+2. `run` gets `{ flags, args, json, log }` and returns JSON-serialisable data.
 3. Fail with `throw new CliError(message, { code, hint, details })`. `details` is for structured findings (a failing check still reports them). Use `UsageError` for bad input (exit 2).
 4. Add it to the array in `src/commands/index.ts`.
 5. Give it at least one example. The first example is shown when a required flag is missing.

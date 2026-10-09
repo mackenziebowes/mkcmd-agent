@@ -19,7 +19,7 @@ test("hello returns JSON", async () => {
   expect(JSON.parse(stdout)).toEqual({ ok: true, command: "hello", result: { greeting: "Hello, Ada!" } });
 });
 
-test("a missing required flag is a usage error, not a prompt", async () => {
+test("a missing required flag is a usage error", async () => {
   const { code, stdout } = await run("hello", "--json");
   expect(code).toBe(2);
   expect(JSON.parse(stdout).error.code).toBe("usage");

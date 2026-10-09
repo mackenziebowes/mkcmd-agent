@@ -27,7 +27,7 @@ export const sync = defineCommand({
   summary: "Sync records from the API",
   description: "Fetches records changed since a date and writes them to ./data.",
   flags: {
-    since: { type: "string", required: true, description: "ISO date, YYYY-MM-DD", prompt: "Sync since which date?" },
+    since: { type: "string", required: true, description: "ISO date, YYYY-MM-DD" },
     limit: { type: "string", default: "100", description: "Maximum records" },
     "dry-run": { type: "boolean", description: "Report without writing" },
   },
@@ -76,10 +76,9 @@ export const sync = defineCommand({
             rows={[
               { Field: <C>type</C>, Description: '"string" or "boolean". There is no number type: take a string and convert it in run.' },
               { Field: <C>description</C>, Description: "Shown in help and describe. Required." },
-              { Field: <C>required</C>, Description: "Missing means a usage error (exit 2), unless a human answers its prompt." },
+              { Field: <C>required</C>, Description: "Missing means a usage error (exit 2) that shows the first example." },
               { Field: <C>default</C>, Description: "Used when the flag is absent. A string flag with a default is typed as string, not string | undefined." },
               { Field: <C>short</C>, Description: 'One-letter alias, e.g. "n" for -n.' },
-              { Field: <C>prompt</C>, Description: "Question asked when a required flag is missing and a human is at a terminal. See the output contract." },
             ]}
           />
         </div>
@@ -99,7 +98,6 @@ export const sync = defineCommand({
               { Field: <C>args</C>, Description: "Positional arguments after the command name, as strings." },
               { Field: <C>log(message)</C>, Description: "Write progress to stderr. Never use console.log for output: stdout is reserved for the result." },
               { Field: <C>json</C>, Description: "True when --json was passed. Rarely needed: return data and let the framework format it." },
-              { Field: <C>interactive</C>, Description: "True when a human is at a terminal and prompting is allowed." },
             ]}
           />
         </div>

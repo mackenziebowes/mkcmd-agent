@@ -51,7 +51,7 @@ group("the contract", () => {
     expect(json(stdout).error.message).toContain("--colour");
   });
 
-  test("a missing required flag fails fast instead of prompting", async () => {
+  test("a missing required flag is a usage error", async () => {
     const { code, stdout } = await cli("init", "--json");
     expect(code).toBe(2);
     expect(json(stdout).error.message).toBe("Missing required flag: --name.");
@@ -67,6 +67,15 @@ group("the contract", () => {
   test("describe includes short forms of global flags", async () => {
     const d = json((await cli("describe")).stdout);
     expect(d.globalFlags.find((f: { name: string }) => f.name === "--help").short).toBe("-h");
+  });
+
+  test("there are no prompts: no prompt fields, no --no-input", async () => {
+    const d = json((await cli("describe")).stdout);
+    expect(JSON.stringify(d)).not.toContain('"prompt"');
+    expect(d.globalFlags.map((f: { name: string }) => f.name)).toEqual(["--json", "--help"]);
+    const r = await cli("init", "--name", "x", "--no-input", "--json");
+    expect(r.code).toBe(2);
+    expect(json(r.stdout).error.message).toContain("--no-input");
   });
 
   test("--version reads package.json", async () => {
@@ -112,9 +121,19 @@ group("init", () => {
     const { code, stdout } = await cli("init", "--name", "@acme/scoped", "--dir", dir, "--json");
     expect(code).toBe(0);
     expect(json(stdout).result.dir).toBe(dir);
+    expect(json(stdout).result.next[0]).toBe("cd nested/scoped"); // inside cwd: relative
     const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
     expect(pkg.bin).toEqual({ scoped: "./src/index.ts" });
   });
+});
+
+test("the cd hint is absolute when the project is outside the working directory", async () => {
+  const outside = mkdtempSync(join(tmpdir(), "mkcmd-outside-"));
+  const r = await cli("init", "--name", "far", "--dir", join(outside, "far"), "--json");
+  expect(json(r.stdout).result.next[0]).toBe(`cd ${join(outside, "far")}`);
+  const dry = await cli("init", "--name", "near", "--dir", join(tmp, "near"), "--dry-run", "--json");
+  expect(json(dry.stdout).result.next[0]).toBe("cd near");
+  rmSync(outside, { recursive: true, force: true });
 });
 
 group("a generated project", () => {

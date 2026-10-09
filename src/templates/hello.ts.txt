@@ -6,7 +6,7 @@ export const hello = defineCommand({
   name: "hello",
   summary: "Greet someone",
   flags: {
-    name: { type: "string", required: true, description: "Who to greet", prompt: "Who should I greet?" },
+    name: { type: "string", required: true, description: "Who to greet" },
     shout: { type: "boolean", description: "Uppercase the greeting" },
   },
   examples: [{{HELLO_EXAMPLE_JSON}}],
