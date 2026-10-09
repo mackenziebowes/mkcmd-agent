@@ -68,6 +68,11 @@ group("the contract", () => {
     expect(stdout).toContain("Examples:");
   });
 
+  test("describe includes short forms of global flags", async () => {
+    const d = json((await cli("describe")).stdout);
+    expect(d.globalFlags.find((f: { name: string }) => f.name === "--help").short).toBe("-h");
+  });
+
   test("--version reads package.json", async () => {
     const { code, stdout } = await cli("--version", "--json");
     expect(code).toBe(0);
@@ -130,6 +135,22 @@ group("a generated project", () => {
     const { code, stdout } = await sh(["bun", "src/index.ts", "describe"], dir);
     expect(code).toBe(0);
     expect(json(stdout).about).toBe(description);
+  });
+
+  test("an empty result prints (none) for people, [] for agents", async () => {
+    writeFileSync(
+      join(dir, "src/commands/empty.ts"),
+      'import { defineCommand } from "../core/cli";\nexport const empty = defineCommand({ name: "empty", summary: "Nothing", run: () => [] });\n',
+    );
+    const index = join(dir, "src/commands/index.ts");
+    const original = readFileSync(index, "utf8");
+    writeFileSync(index, 'import { empty } from "./empty";\n' + original.replace("[hello]", "[hello, empty]"));
+    const text = await sh(["bun", "src/index.ts", "empty"], dir);
+    const asJson = await sh(["bun", "src/index.ts", "empty", "--json"], dir);
+    writeFileSync(index, original);
+    rmSync(join(dir, "src/commands/empty.ts"));
+    expect(text.stdout.trim()).toBe("(none)");
+    expect(json(asJson.stdout).result).toEqual([]);
   });
 
   test("runs its example command", async () => {

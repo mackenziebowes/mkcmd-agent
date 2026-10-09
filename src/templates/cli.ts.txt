@@ -265,7 +265,12 @@ export function describe(meta: CliMeta, only?: Command<any, any>) {
       stderr: "progress and logs only",
       prompts: "only at an interactive terminal; --no-input disables them",
     },
-    globalFlags: Object.entries(GLOBAL_FLAGS).map(([name, s]) => ({ name: `--${name}`, type: s.type, description: s.description })),
+    globalFlags: Object.entries(GLOBAL_FLAGS).map(([name, s]) => ({
+      name: `--${name}`,
+      ...(s.short ? { short: `-${s.short}` } : {}),
+      type: s.type,
+      description: s.description,
+    })),
     commands: meta.commands.map(cmdJson),
   };
 }
@@ -318,6 +323,8 @@ function flagLines(flags: Flags): string[] {
 
 function formatHuman(value: unknown, indent = ""): string {
   if (value === null || typeof value !== "object") return `${indent}${String(value)}`;
+  if (Array.isArray(value) && value.length === 0) return `${indent}(none)`;
+  if (Object.keys(value).length === 0) return `${indent}(empty)`;
   if (Array.isArray(value)) {
     return value
       .map((v) => (v !== null && typeof v === "object" ? formatHuman(v, indent + "  ") : `${indent}- ${String(v)}`))

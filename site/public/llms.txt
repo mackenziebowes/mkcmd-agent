@@ -10,7 +10,8 @@ Not on npm yet. Run from source (Bun 1.2+):
     cd ~/mkcmd-agent && bun install
     bun ~/mkcmd-agent/src/index.ts --help
 
-Below, `mkcmd-agent` means `bun ~/mkcmd-agent/src/index.ts`.
+Any clone directory works; this manual uses ~/mkcmd-agent. Below, `mkcmd-agent` means `bun ~/mkcmd-agent/src/index.ts`.
+Agents: run that full command every time. Most agent tools start a fresh shell per command, so an alias set in one call is gone in the next.
 
 ## Commands
 
@@ -92,7 +93,7 @@ Register it: add `sync` to `export const commands = [...]` in src/commands/index
 
 Flag spec fields: type ("string" | "boolean"), description (required), required, default, short (one letter), prompt.
 Types: required or defaulted strings are string; other strings are string | undefined; booleans are boolean.
-CliError(message, { code, hint, exitCode }) defaults to exit 1. UsageError(message, hint) exits 2 with code "usage". Other exceptions become code "internal", exit 1. Never call process.exit or print errors yourself.
+CliError(message, { code, hint, exitCode }) defaults to exit 1. Always pass a code: without one, agents get the generic "error". UsageError(message, hint) exits 2 with code "usage". Other exceptions become code "internal", exit 1. Never call process.exit or print errors yourself.
 
 ## Testing
 

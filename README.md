@@ -9,9 +9,9 @@ Docs: **[mkcmd.mackenziebowes.com](https://mkcmd.mackenziebowes.com)**
 Not on npm yet. Run it from source with [Bun](https://bun.sh) 1.2+:
 
 ```bash
-git clone https://github.com/mackenziebowes/mkcmd-agent ~/mkcmd-agent
+git clone https://github.com/mackenziebowes/mkcmd-agent ~/mkcmd-agent   # any directory works
 cd ~/mkcmd-agent && bun install
-alias mkcmd-agent="bun ~/mkcmd-agent/src/index.ts"
+alias mkcmd-agent="bun ~/mkcmd-agent/src/index.ts"   # agents: call the full command instead
 
 mkcmd-agent init --name my-cli --description "Does one thing well"
 cd my-cli && bun install

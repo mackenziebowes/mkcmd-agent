@@ -39,9 +39,14 @@ export default function UsagePage() {
               ]}
             />
             <P>
-              The examples below call it as <C>mkcmd-agent</C>. From source, that means{" "}
-              <C>bun ~/mkcmd-agent/src/index.ts</C>. To get the short name, add{" "}
-              <C>alias mkcmd-agent=&quot;bun ~/mkcmd-agent/src/index.ts&quot;</C> to your shell profile.
+              Any directory works; these docs use <C>~/mkcmd-agent</C>. The examples below call it as{" "}
+              <C>mkcmd-agent</C>, which from source means <C>bun ~/mkcmd-agent/src/index.ts</C>.
+            </P>
+            <P>
+              <strong>Agents:</strong> run the full <C>bun ~/mkcmd-agent/src/index.ts ...</C> command each time. Most
+              agent tools start a fresh shell per command, so an alias set in one call is gone in the next.{" "}
+              <strong>People:</strong> add <C>alias mkcmd-agent=&quot;bun ~/mkcmd-agent/src/index.ts&quot;</C> to your
+              shell profile.
             </P>
           </>
         )}
