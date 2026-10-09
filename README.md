@@ -6,8 +6,14 @@ Most CLIs are built for someone at a keyboard: they ask questions, print decorat
 
 Docs: **[mkcmd.mackenziebowes.com](https://mkcmd.mackenziebowes.com)**
 
+Not on npm yet. Run it from source with [Bun](https://bun.sh) 1.2+:
+
 ```bash
-bunx @mbsi/mkcmd-agent init --name my-cli --description "Does one thing well"
+git clone https://github.com/mackenziebowes/mkcmd-agent ~/mkcmd-agent
+cd ~/mkcmd-agent && bun install
+alias mkcmd-agent="bun ~/mkcmd-agent/src/index.ts"
+
+mkcmd-agent init --name my-cli --description "Does one thing well"
 cd my-cli && bun install
 bun run src/index.ts describe
 ```
