@@ -1,6 +1,6 @@
 // Templates are bundled as text by `bun build`, so the published CLI is one file.
 // cli.ts.txt is a copy of src/core/cli.ts (Bun cannot import one file as both
-// code and text). `bun run sync-core` refreshes it; a test fails if they drift.
+// code and text). `bun run sync-core` refreshes it; the end-to-end bundle test fails if they drift.
 import coreCli from "../templates/cli.ts.txt" with { type: "text" };
 import indexTs from "../templates/index.ts.txt" with { type: "text" };
 import commandsIndexTs from "../templates/commands-index.ts.txt" with { type: "text" };

@@ -112,7 +112,7 @@ bun run build       # dist/index.js, with templates bundled in
 
 The test suite drives the CLI as a subprocess, generates real projects, runs their tests, and checks the built bundle.
 
-`src/templates/cli.ts.txt` is a copy of `src/core/cli.ts`, because Bun can't import one file as both code and text. `bun run sync-core` refreshes it and a test fails if they drift. More in [AGENTS.md](./AGENTS.md).
+`src/templates/cli.ts.txt` is a copy of `src/core/cli.ts`, because Bun can't import one file as both code and text. `bun run sync-core` refreshes it and the end-to-end bundle test fails if they drift. More in [AGENTS.md](./AGENTS.md).
 
 The docs site lives in [`site/`](./site).
 

@@ -19,10 +19,6 @@ async function sh(cmd: string[], cwd = ROOT) {
 const cli = (...args: string[]) => sh(["bun", join(ROOT, "src/index.ts"), ...args], tmp);
 const json = (s: string) => JSON.parse(s);
 
-test("the core template matches src/core/cli.ts (run `bun run sync-core`)", () => {
-  expect(readFileSync(join(ROOT, "src/templates/cli.ts.txt"), "utf8")).toBe(readFileSync(join(ROOT, "src/core/cli.ts"), "utf8"));
-});
-
 group("the contract", () => {
   test("describe lists commands, flags and the output contract", async () => {
     const { code, stdout } = await cli("describe");
@@ -193,6 +189,7 @@ group("a generated project", () => {
 });
 
 group("the bundle", () => {
+  // Also catches a stale src/templates/cli.ts.txt: the generated core must equal src/core/cli.ts.
   test("dist/index.js carries its templates", async () => {
     const build = await sh(["bun", "run", "build"]);
     expect(build.code).toBe(0);

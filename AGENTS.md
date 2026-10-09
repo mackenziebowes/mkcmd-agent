@@ -21,7 +21,7 @@ mkcmd-agent scaffolds agent-drivable Bun CLIs. It is built on the same framework
 
 ## Rules
 
-- After editing `src/core/cli.ts`, run `bun run sync-core` (or `bun run test`, which does it). A test fails if the copy drifts.
+- After editing `src/core/cli.ts`, run `bun run sync-core` (or `bun run test`, which does it). The end-to-end bundle test fails if the copy drifts.
 - Commands return data and throw `CliError` / `UsageError`. Never `console.log` a result or call `process.exit` in a command.
 - New template files need an import in `templates.ts`, an entry in `planProject`, and a test that a generated project still passes `bun test`.
 - Keep the generated project's AGENTS.md (`src/templates/AGENTS.md.txt`) in step with any change to the contract.
