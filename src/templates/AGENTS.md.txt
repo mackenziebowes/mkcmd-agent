@@ -24,7 +24,7 @@ The framework in `src/core/cli.ts` enforces this for every command. Do not print
 
 1. Create `src/commands/<name>.ts` exporting `defineCommand({ name, summary, flags, examples, run })`.
 2. `run` gets `{ flags, args, json, interactive, log }` and returns JSON-serialisable data.
-3. Fail with `throw new CliError(message, { code, hint })`. Use `UsageError` for bad input (exit 2).
+3. Fail with `throw new CliError(message, { code, hint, details })`. `details` is for structured findings (a failing check still reports them). Use `UsageError` for bad input (exit 2).
 4. Add it to the array in `src/commands/index.ts`.
 5. Give it at least one example. The first example is shown when a required flag is missing.
 

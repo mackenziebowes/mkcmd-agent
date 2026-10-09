@@ -107,7 +107,9 @@ export const sync = defineCommand({
 
       <DocSection id="errors" title="Errors">
         <P>
-          <C>throw new CliError(message, {"{ code, hint, exitCode }"})</C> fails with exit code 1 (or <C>exitCode</C>).
+          <C>throw new CliError(message, {"{ code, hint, exitCode, details }"})</C> fails with exit code 1 (or{" "}
+          <C>exitCode</C>). <C>details</C> carries structured data: agents get it as <C>error.details</C>, and people see
+          it through <C>render</C>, so a failing check can still show its report.
           Always pass a stable snake_case <C>code</C>: agents branch on it, and without one they get the generic{" "}
           <C>error</C>. <C>throw new UsageError(message, hint)</C> is for bad
           input and exits 2 with code <C>usage</C>. Any other exception becomes code <C>internal</C>, exit 1.

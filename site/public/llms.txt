@@ -53,7 +53,7 @@ Scripts: bun run start, bun test, bun run typecheck, bun run build (compiled bin
 
 - --json prints exactly one JSON object on stdout:
   success: {"ok": true, "command": "<name>", "result": <returned data or null>}
-  failure: {"ok": false, "command": "<name or null>", "error": {"code": "...", "message": "...", "hint": "... (optional)"}}
+  failure: {"ok": false, "command": "<name or null>", "error": {"code": "...", "message": "...", "hint": "... (optional)", "details": <optional data, e.g. what a check found>}}
 - Without --json: result printed by the command's render(), else as key: value lines. Errors go to stderr as "error: ..." and "hint: ...".
 - stderr: progress/logs only. stdout: the result only.
 - Exit codes: 0 success (also --help, describe, --version); 1 command failed (its own error code, or "internal" for an unexpected exception); 2 usage error (code "usage": unknown command, unknown flag, missing required flag, invalid value; also no arguments at all).
@@ -93,7 +93,7 @@ Register it: add `sync` to `export const commands = [...]` in src/commands/index
 
 Flag spec fields: type ("string" | "boolean"), description (required), required, default, short (one letter), prompt.
 Types: required or defaulted strings are string; other strings are string | undefined; booleans are boolean.
-CliError(message, { code, hint, exitCode }) defaults to exit 1. Always pass a code: without one, agents get the generic "error". UsageError(message, hint) exits 2 with code "usage". Other exceptions become code "internal", exit 1. Never call process.exit or print errors yourself.
+CliError(message, { code, hint, exitCode, details }) defaults to exit 1. details is returned as error.details with --json, and printed through render() for people: use it when a check fails but its findings matter (lint, validate, gate). Always pass a code: without one, agents get the generic "error". UsageError(message, hint) exits 2 with code "usage". Other exceptions become code "internal", exit 1. Never call process.exit or print errors yourself.
 
 ## Testing
 

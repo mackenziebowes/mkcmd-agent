@@ -72,11 +72,14 @@ export class CliError extends Error {
   code: string;
   hint?: string;
   exitCode: number;
-  constructor(message: string, opts: { code?: string; hint?: string; exitCode?: number } = {}) {
+  /** Structured data about the failure, e.g. what a check found. JSON: error.details. */
+  details?: unknown;
+  constructor(message: string, opts: { code?: string; hint?: string; exitCode?: number; details?: unknown } = {}) {
     super(message);
     this.code = opts.code ?? "error";
     this.hint = opts.hint;
     this.exitCode = opts.exitCode ?? 1;
+    this.details = opts.details;
   }
 }
 
@@ -113,6 +116,7 @@ export async function runCLI(meta: CliMeta, argv = process.argv.slice(2), out: O
   const interactive = !json && !noInput && Boolean(process.stdin.isTTY && process.stdout.isTTY);
   const [first, ...rest] = argv;
   let commandName = "";
+  let activeCommand: Command<any, any> | undefined;
 
   const emitOk = (result: unknown, render?: (r: any) => string) => {
     if (json) {
@@ -128,10 +132,15 @@ export async function runCLI(meta: CliMeta, argv = process.argv.slice(2), out: O
         ? err
         : new CliError(err instanceof Error ? err.message : String(err), { code: "internal" });
     if (json) {
-      const error: Record<string, string> = { code: e.code, message: e.message };
+      const error: Record<string, unknown> = { code: e.code, message: e.message };
       if (e.hint) error.hint = e.hint;
+      if (e.details !== undefined) error.details = e.details;
       out.stdout(JSON.stringify({ ok: false, command: commandName || null, error }));
     } else {
+      // Details print like a result (through the command's render), so a failing check still shows its report.
+      if (e.details !== undefined) {
+        out.stdout(activeCommand?.render ? activeCommand.render(e.details) : formatHuman(e.details));
+      }
       out.stderr(`error: ${e.message}`);
       if (e.hint) out.stderr(`hint: ${e.hint}`);
     }
@@ -167,6 +176,7 @@ export async function runCLI(meta: CliMeta, argv = process.argv.slice(2), out: O
     }
 
     const cmd = findCommand(meta, first);
+    activeCommand = cmd;
     const flagSpecs: Flags = { ...GLOBAL_FLAGS, ...flagsOf(cmd) };
     let parsed;
     try {
@@ -260,7 +270,7 @@ export function describe(meta: CliMeta, only?: Command<any, any>) {
     name: meta.name,
     about: meta.about,
     contract: {
-      json: "--json prints one object on stdout: {ok, command, result} or {ok:false, command, error:{code, message, hint}}",
+      json: "--json prints one object on stdout: {ok, command, result} or {ok:false, command, error:{code, message, hint?, details?}}",
       exitCodes: { "0": "success", "1": "failure", "2": "usage error" },
       stderr: "progress and logs only",
       prompts: "only at an interactive terminal; --no-input disables them",

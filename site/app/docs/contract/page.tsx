@@ -43,7 +43,8 @@ export default function ContractPage() {
         </P>
         <BlueprintCodeBlock label="FAILURE">{`{"ok": false, "command": "hello", "error": {"code": "usage", "message": "Missing required flag: --name.", "hint": "Example: my-cli hello --name Ada --json"}}`}</BlueprintCodeBlock>
         <P>
-          <C>hint</C> is present only when there is one. <C>command</C> is <C>null</C> if the failure happened before a
+          <C>hint</C> is present only when there is one. <C>details</C> appears when a command fails with structured
+          data, such as the findings of a check that didn&apos;t pass. <C>command</C> is <C>null</C> if the failure happened before a
           command was chosen. Check <C>ok</C> or the exit code; both always agree.
         </P>
         <P>

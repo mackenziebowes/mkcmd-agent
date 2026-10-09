@@ -149,6 +149,28 @@ group("a generated project", () => {
     expect(json(asJson.stdout).result).toEqual([]);
   });
 
+  test("a failing check returns its details: JSON for agents, rendered for people", async () => {
+    writeFileSync(
+      join(dir, "src/commands/gate.ts"),
+      'import { defineCommand, CliError } from "../core/cli";\n' +
+        'export const gate = defineCommand({ name: "gate", summary: "Fails with a report",\n' +
+        '  run: () => { throw new CliError("2 problems.", { code: "check_failed", details: { problems: 2 } }); },\n' +
+        '  render: (r: { problems: number }) => `found ${r.problems}` });\n',
+    );
+    const index = join(dir, "src/commands/index.ts");
+    const original = readFileSync(index, "utf8");
+    writeFileSync(index, 'import { gate } from "./gate";\n' + original.replace("[hello]", "[hello, gate]"));
+    const asJson = await sh(["bun", "src/index.ts", "gate", "--json"], dir);
+    const text = await sh(["bun", "src/index.ts", "gate"], dir);
+    writeFileSync(index, original);
+    rmSync(join(dir, "src/commands/gate.ts"));
+    expect(asJson.code).toBe(1);
+    expect(json(asJson.stdout).error).toEqual({ code: "check_failed", message: "2 problems.", details: { problems: 2 } });
+    expect(text.code).toBe(1);
+    expect(text.stdout.trim()).toBe("found 2");
+    expect(text.stderr).toContain("error: 2 problems.");
+  });
+
   test("runs its example command", async () => {
     const { code, stdout } = await sh(["bun", "src/index.ts", "hello", "--name", "Ada", "--shout", "--json"], dir);
     expect(code).toBe(0);
