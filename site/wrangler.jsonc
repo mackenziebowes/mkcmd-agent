@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "mkcmd-site",
+  "compatibility_date": "2026-10-08",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "mkcmd.mackenziebowes.com", "custom_domain": true }
+  ]
+}

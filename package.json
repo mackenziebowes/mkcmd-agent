@@ -2,10 +2,30 @@
 	"name": "@mbsi/mkcmd-agent",
 	"version": "0.1.0",
 	"description": "Scaffold Bun CLIs that agents can drive: flags only, --json output, real exit codes, and a describe command.",
+	"license": "MIT",
+	"author": "Mackenzie Bowes <mackenzie@mackenziebowes.com> (https://mackenziebowes.com)",
+	"homepage": "https://mkcmd.mackenziebowes.com",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mackenziebowes/mkcmd-agent.git"
+	},
+	"keywords": [
+		"cli",
+		"scaffold",
+		"bun",
+		"agents",
+		"llm",
+		"json"
+	],
 	"type": "module",
 	"bin": {
 		"mkcmd-agent": "./dist/index.js"
 	},
+	"files": [
+		"dist/index.js",
+		"README.md",
+		"LICENSE"
+	],
 	"scripts": {
 		"sync-core": "cp src/core/cli.ts src/templates/cli.ts.txt",
 		"prebuild": "bun run sync-core",

@@ -1,6 +1,10 @@
 # mkcmd-agent
 
-Scaffolds Bun + TypeScript CLIs that an agent can drive as easily as a person. A fork of [mkcmd](https://github.com/mackenziebowes/mkcmd), which asks its questions through interactive prompts.
+Scaffold Bun CLIs that an agent can drive as easily as a person.
+
+Most CLIs are built for someone at a keyboard: they ask questions, print decorated text, and exit 0 when something goes wrong. An agent can't answer a prompt, can't reliably parse a banner, and can't tell success from failure. mkcmd-agent generates CLIs with a contract that works for both.
+
+Docs: **[mkcmd.mackenziebowes.com](https://mkcmd.mackenziebowes.com)**
 
 ```bash
 bunx @mbsi/mkcmd-agent init --name my-cli --description "Does one thing well"
@@ -8,26 +12,49 @@ cd my-cli && bun install
 bun run src/index.ts describe
 ```
 
-## What every generated CLI does
+## The contract
 
-- **Flags only.** Required flags can declare a `prompt`, which is asked only when a human is at a terminal. `--json` and `--no-input` turn prompts off, and a missing flag is a usage error with an example.
-- **`--json`** prints exactly one object on stdout: `{"ok": true, "command", "result"}` or `{"ok": false, "command", "error": {"code", "message", "hint"}}`.
-- **stderr for progress, stdout for results**, so output pipes cleanly.
-- **Exit codes:** 0 success, 1 failure, 2 usage error.
-- **`describe`** prints every command, flag, default and example as JSON. `<command> --help` prints the same for one command as text.
-- **Subprocess tests** of that contract in `test/cli.test.ts`.
+Every generated CLI, and mkcmd-agent itself, behaves the same way:
 
-The framework is one dependency-free file, `src/core/cli.ts`, copied into each project.
+| | |
+|---|---|
+| **Input** | Flags and positionals only. A required flag can declare a `prompt`, asked only when a human is at a terminal. |
+| **Output** | `--json` prints one object on stdout: `{"ok": true, "command", "result"}` or `{"ok": false, "command", "error": {"code", "message", "hint"}}`. |
+| **Logs** | Progress goes to stderr, so stdout is always just the result. |
+| **Exit codes** | `0` success, `1` failure, `2` usage error (unknown command or flag, missing required flag). |
+| **Discovery** | `describe` prints every command, flag, default and example as JSON. `<command> --help` shows one command as text. |
+| **No surprises** | `--no-input` disables prompts everywhere. Nothing ever waits on stdin in a pipeline. |
+
+What that looks like to an agent:
+
+```console
+$ my-cli hello --json
+{"ok":false,"command":"hello","error":{"code":"usage","message":"Missing required flag: --name.","hint":"Example: my-cli hello --name Ada --json"}}
+$ echo $?
+2
+$ my-cli hello --name Ada --json
+{"ok":true,"command":"hello","result":{"greeting":"Hello, Ada!"}}
+```
+
+The same command for a person:
+
+```console
+$ my-cli hello
+Who should I greet? Ada
+Hello, Ada!
+```
 
 ## Commands
 
 | Command | What it does |
 |---|---|
-| `init --name <name>` | New project. `--description`, `--dir`, `--force`, `--dry-run`, `--install`. |
-| `add --name <command>` | New command file in an existing project, registered in `src/commands/index.ts`. `--summary`, `--dir`, `--force`, `--dry-run`. |
-| `describe` | This CLI's own commands and flags as JSON. |
+| `init --name <name>` | Create a project. Flags: `--description`, `--dir`, `--force`, `--dry-run`, `--install`. |
+| `add --name <command>` | Add a command to an existing project and register it. Flags: `--summary`, `--dir`, `--force`, `--dry-run`. |
+| `describe` | This CLI's commands and flags, as JSON. |
 
-A command looks like this:
+`init --dry-run --json` lists exactly what would be written. Neither command overwrites anything without `--force`.
+
+## Writing a command
 
 ```ts
 import { defineCommand, CliError } from "../core/cli";
@@ -41,11 +68,32 @@ export const sync = defineCommand({
   },
   examples: ["my-cli sync --since 2026-01-01 --json"],
   run: async ({ flags, log }) => {
-    log("fetching");                       // stderr
-    return { synced: 12, since: flags.since };  // stdout, as text or JSON
+    log("fetching");                              // stderr
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(flags.since)) {
+      throw new CliError("Bad date.", { code: "bad_date", hint: "Use YYYY-MM-DD." });
+    }
+    return { synced: 12, since: flags.since };    // stdout, as text or JSON
   },
 });
 ```
+
+`run` returns data and throws to fail. Flags are typed from their declarations, so `flags.since` is a `string` and `flags["dry-run"]` is a `boolean`. The framework handles parsing, help, JSON, exit codes and prompting.
+
+## What you get
+
+```
+my-cli/
+├── AGENTS.md            the contract and how to add commands, for the next agent
+├── src/
+│   ├── index.ts         entry point
+│   ├── core/cli.ts      the framework: one file, no dependencies
+│   └── commands/
+│       ├── index.ts     the list of commands
+│       └── hello.ts     an example
+└── test/cli.test.ts     subprocess tests of the contract
+```
+
+After `bun install`, the generated project passes `bun test` and `tsc --noEmit`.
 
 ## Development
 
@@ -53,7 +101,19 @@ export const sync = defineCommand({
 bun install
 bun run test        # syncs the core template, then runs the suite
 bun run typecheck
-bun run build       # dist/index.js, templates bundled in
+bun run build       # dist/index.js, with templates bundled in
 ```
 
-`src/templates/cli.ts.txt` is a copy of `src/core/cli.ts`, because Bun can't import one file as both code and text. `bun run sync-core` refreshes it, and a test fails if they drift.
+The test suite drives the CLI as a subprocess, generates real projects, runs their tests, and checks the built bundle.
+
+`src/templates/cli.ts.txt` is a copy of `src/core/cli.ts`, because Bun can't import one file as both code and text. `bun run sync-core` refreshes it and a test fails if they drift. More in [AGENTS.md](./AGENTS.md).
+
+The docs site lives in [`site/`](./site).
+
+## Background
+
+A fork of [mkcmd](https://github.com/mackenziebowes/mkcmd), which scaffolds the same kind of CLI through interactive prompts. mkcmd-agent keeps the idea and rebuilds the interface around flags, structured output and exit codes.
+
+## License
+
+MIT. See [LICENSE](./LICENSE).
