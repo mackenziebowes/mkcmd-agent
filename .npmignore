@@ -8,7 +8,7 @@ RETRO.md
 TASK-RETRO.md
 
 # Build artifacts
-dist/mkcmd
+dist/mkcmd-agent
 
 # Git
 .git/

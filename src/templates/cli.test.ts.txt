@@ -1,0 +1,26 @@
+import { expect, test } from "bun:test";
+
+const run = async (...args: string[]) => {
+  const proc = Bun.spawn(["bun", "src/index.ts", ...args], { stdout: "pipe", stderr: "pipe", stdin: "ignore" });
+  const [stdout, stderr] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text()]);
+  return { code: await proc.exited, stdout, stderr };
+};
+
+test("describe lists every command as JSON", async () => {
+  const { code, stdout } = await run("describe");
+  expect(code).toBe(0);
+  const d = JSON.parse(stdout);
+  expect(d.commands.map((c: { name: string }) => c.name)).toContain("hello");
+});
+
+test("hello returns JSON", async () => {
+  const { code, stdout } = await run("hello", "--name", "Ada", "--json");
+  expect(code).toBe(0);
+  expect(JSON.parse(stdout)).toEqual({ ok: true, command: "hello", result: { greeting: "Hello, Ada!" } });
+});
+
+test("a missing required flag is a usage error, not a prompt", async () => {
+  const { code, stdout } = await run("hello", "--json");
+  expect(code).toBe(2);
+  expect(JSON.parse(stdout).error.code).toBe("usage");
+});

@@ -1,13 +1,4 @@
-import { registerCommand } from "../core/cli";
-import { orchestrateScaffold } from "../functions/orchestrate-scaffold";
+import { init } from "./init";
+import { add } from "./add";
 
-export function registerCommands() {
-  registerCommand({
-    name: "init",
-    description: "Initialize a new CLI project",
-    instructions: "You will be prompted for project details",
-    run: async () => {
-      await orchestrateScaffold();
-    },
-  });
-}
+export const commands = [init, add];

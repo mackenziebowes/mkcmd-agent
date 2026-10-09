@@ -1,0 +1,14 @@
+import { defineCommand, CliError } from "../core/cli";
+
+export const {{IDENT}} = defineCommand({
+  name: {{CMD_JSON}},
+  summary: {{SUMMARY_JSON}},
+  flags: {
+    // example: { type: "string", required: true, description: "What this flag does" },
+  },
+  examples: [{{EXAMPLE_JSON}}],
+  run: ({ flags, args, log }) => {
+    // Return JSON-serialisable data. Throw new CliError("...", { code, hint }) to fail.
+    throw new CliError("Not implemented yet.", { code: "not_implemented" });
+  },
+});

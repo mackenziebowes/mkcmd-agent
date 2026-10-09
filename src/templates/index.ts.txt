@@ -3,7 +3,7 @@ import { runCLI } from "./core/cli";
 import { commands } from "./commands";
 
 process.exitCode = await runCLI({
-  name: "mkcmd-agent",
-  about: "Scaffolds Bun CLIs that agents can drive: flags only, --json output, real exit codes, and a describe command.",
+  name: {{NAME_JSON}},
+  about: {{ABOUT_JSON}},
   commands,
 });

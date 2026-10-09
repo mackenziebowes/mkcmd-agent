@@ -1,0 +1,4 @@
+import { hello } from "./hello";
+
+// Every command the CLI exposes. `mkcmd-agent add <name>` appends to this list.
+export const commands = [hello];

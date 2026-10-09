@@ -1,0 +1,18 @@
+import { defineCommand } from "../core/cli";
+
+// Example command. Return data; the framework prints it as text or, with
+// --json, as {"ok": true, "command": "hello", "result": {...}}.
+export const hello = defineCommand({
+  name: "hello",
+  summary: "Greet someone",
+  flags: {
+    name: { type: "string", required: true, description: "Who to greet", prompt: "Who should I greet?" },
+    shout: { type: "boolean", description: "Uppercase the greeting" },
+  },
+  examples: [{{HELLO_EXAMPLE_JSON}}],
+  run: ({ flags }) => {
+    const greeting = `Hello, ${flags.name}!`;
+    return { greeting: flags.shout ? greeting.toUpperCase() : greeting };
+  },
+  render: (r) => r.greeting,
+});

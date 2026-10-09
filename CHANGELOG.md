@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-10-08
+
+Forked from mkcmd 0.3.1 as mkcmd-agent and rebuilt for agents.
+
+### Added
+- Flag-driven `init` (`--name`, `--description`, `--dir`, `--force`, `--dry-run`, `--install`). Prompts only for a human at a terminal.
+- `add` command: scaffolds a command file and registers it.
+- `--json` envelope, exit codes (0/1/2), `describe`, per-command `--help`, `--no-input` in the framework and every generated CLI.
+- Generated projects include AGENTS.md, a `hello` example, and subprocess tests.
+- Test suite covering the contract, scaffolding, generated projects and the bundle.
+
+### Changed
+- Templates are bundled as text imports; the stringifier and generated `src/data/core.ts` are gone.
+- Dropped `@clack/prompts` and `figlet`. The framework has no dependencies.
+
+### Fixed
+- `--version` found the wrong package.json in generated projects.
+- Descriptions containing quotes produced invalid code.
+- Absolute `--dir` paths were joined onto the working directory.
+- Re-running `init` silently overwrote an existing project.
+- Running with no command exited 0.
+- The generated README pointed at a nonexistent `index.ts`.
+
 ## [Unreleased]
 
 ## [0.3.1] - 2026-1-1

@@ -1,134 +1,59 @@
-# mkcmd
+# mkcmd-agent
 
-A CLI tool for scaffolding new CLI projects with sensible defaults. Create command-line tools with TypeScript, Bun runtime, and a solid core structure out of the box.
-
-## Features
-
-- **Interactive Setup** - Prompts for project name, location, and description
-- **Complete CLI Framework** - Generates a working CLI with command registration, logging, and helpers
-- **TypeScript + Bun** - Pre-configured with TypeScript and Bun runtime support
-- **Core Utilities** - Includes `FileBuilder` for dynamic code generation and file utilities
-- **Extensible** - Easy to add your own commands
-
-> [!WARNING]
-> While you can *run* the program in without Bun, the source code itself **depends on Bun** for development and building
-
-## Run remotely
+Scaffolds Bun + TypeScript CLIs that an agent can drive as easily as a person. A fork of [mkcmd](https://github.com/mackenziebowes/mkcmd), which asks its questions through interactive prompts.
 
 ```bash
-npx @mbsi/mkcmd init
-# or
-bun @mbsi/mkcmd init
+bunx @mbsi/mkcmd-agent init --name my-cli --description "Does one thing well"
+cd my-cli && bun install
+bun run src/index.ts describe
 ```
 
-## Installation
+## What every generated CLI does
 
-```bash
-npm install -g @mbsi/mkcmd
-# or
-bun install -g @mbsi/mkcmd
-```
+- **Flags only.** Required flags can declare a `prompt`, which is asked only when a human is at a terminal. `--json` and `--no-input` turn prompts off, and a missing flag is a usage error with an example.
+- **`--json`** prints exactly one object on stdout: `{"ok": true, "command", "result"}` or `{"ok": false, "command", "error": {"code", "message", "hint"}}`.
+- **stderr for progress, stdout for results**, so output pipes cleanly.
+- **Exit codes:** 0 success, 1 failure, 2 usage error.
+- **`describe`** prints every command, flag, default and example as JSON. `<command> --help` prints the same for one command as text.
+- **Subprocess tests** of that contract in `test/cli.test.ts`.
 
-## Quick Start
+The framework is one dependency-free file, `src/core/cli.ts`, copied into each project.
 
-```bash
-mkcmd init
-```
+## Commands
 
-The `init` command will prompt you for:
-- Project name
-- Target directory (defaults to `./<project-name>`)
-- Project description
+| Command | What it does |
+|---|---|
+| `init --name <name>` | New project. `--description`, `--dir`, `--force`, `--dry-run`, `--install`. |
+| `add --name <command>` | New command file in an existing project, registered in `src/commands/index.ts`. `--summary`, `--dir`, `--force`, `--dry-run`. |
+| `describe` | This CLI's own commands and flags as JSON. |
 
-## What Gets Scaffolding
+A command looks like this:
 
-After running `mkcmd init`, you'll have a complete CLI project:
+```ts
+import { defineCommand, CliError } from "../core/cli";
 
-```
-my-cli/
-├── src/
-│   ├── core/
-│   │   ├── cli.ts              # CLI framework with command registration
-│   │   ├── log.ts              # Logging helpers (single/multi info/warn/err, title)
-│   │   └── helpers/
-│   │       ├── file-builder.ts # Indentation-aware file builder
-│   │       ├── file-utils.ts   # Path and file writing utilities
-│   │       └── stringifier.ts  # Dynamic template code generation
-│   ├── commands/
-│   │   └── index.ts            # Command registration hook
-│   └── config.ts               # Project configuration
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-## Usage
-
-### Running Your New CLI
-
-```bash
-cd my-cli
-bun install
-bun run src/index.ts --help
-```
-
-### Adding Commands
-
-Commands are registered in `src/commands/index.ts`. Here's the pattern:
-
-```typescript
-import { registerCommand } from "../core/cli";
-
-registerCommand({
-  name: "greet",
-  description: "Say hello",
-  instructions: "Pass a name to greet",
-  run: async (args: string[]) => {
-    const name = args[0] || "world";
-    console.log(`Hello, ${name}!`);
-  }
+export const sync = defineCommand({
+  name: "sync",
+  summary: "Sync records from the API",
+  flags: {
+    since: { type: "string", required: true, description: "ISO date to sync from" },
+    "dry-run": { type: "boolean", description: "Report without writing" },
+  },
+  examples: ["my-cli sync --since 2026-01-01 --json"],
+  run: async ({ flags, log }) => {
+    log("fetching");                       // stderr
+    return { synced: 12, since: flags.since };  // stdout, as text or JSON
+  },
 });
 ```
 
-Then run:
+## Development
 
 ```bash
-bun run src/index.ts greet
-bun run src/index.ts greet Alice
+bun install
+bun run test        # syncs the core template, then runs the suite
+bun run typecheck
+bun run build       # dist/index.js, templates bundled in
 ```
 
-### Using the File Builder
-
-The included `FileBuilder` helps generate code files dynamically:
-
-```typescript
-import { FileBuilder } from "./core/helpers/file-builder";
-
-const fb = new FileBuilder();
-fb.addLine("export function hello() {");
-fb.addLine('  console.log("Hello!");', 1);
-fb.addLine("}");
-const code = fb.build();
-```
-
-## CLI Flags
-
-After installation, `mkcmd` supports:
-
-```bash
-mkcmd --help      # Show help
-mkcmd --version   # Show version
-```
-
-## Requirements
-
-- Bun runtime (for running the generated project)
-- Node.js 16+ (for installation via npm)
-
-## License
-
-See LICENSE file for details.
-
----
-
-**Version:** See `npm info @mbsi/mkcmd version`, `npx @mbsi/mkcmd --version`, or run `mkcmd --version` after installation.
+`src/templates/cli.ts.txt` is a copy of `src/core/cli.ts`, because Bun can't import one file as both code and text. `bun run sync-core` refreshes it, and a test fails if they drift.
